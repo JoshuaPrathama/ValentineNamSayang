@@ -59,6 +59,20 @@
           opacity: 1;
         }
       }
+
+      .bounce {
+        animation: bounce 1s infinite;
+      }
+
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
+      }
     </style>
   </head>
 
@@ -72,9 +86,7 @@
         Will You Be My Valentine?
       </h1>
 
-      <p class="text-gray-600 mb-2">
-        Say this first:
-      </p>
+      <p class="text-gray-600 mb-2">Say this first:</p>
 
       <p class="font-bold text-pink-500 mb-4">
         "I LOVE YOU JOSHUA MY CUTIE"
@@ -87,14 +99,20 @@
         🎤 Speak
       </button>
 
-      <p class="output text-sm text-gray-700 mb-5 h-6"></p>
+      <p class="output text-sm text-gray-700 mb-3 h-6"></p>
 
-      <!-- TEXT SETELAH DIA NGOMONG -->
       <p id="afterSpeak" class="hidden text-pink-600 font-semibold mb-4">
         Aww... say it again? 🥺
       </p>
 
-      <!-- YES BUTTON -->
+      <!-- SIGN SURUH TEKAN YES -->
+      <div
+        id="pressSign"
+        class="hidden mb-2 text-pink-500 font-semibold bounce"
+      >
+        👇 Tap this button sayang
+      </div>
+
       <button
         id="yesBtn"
         class="hidden px-10 py-3 text-lg font-semibold text-white bg-pink-500 rounded-xl shadow-xl"
@@ -108,8 +126,10 @@
       </div>
     </div>
 
+    <audio id="voice1" src="Joshua1.mp3"></audio>
+    <audio id="voice2" src="Joshua2.mp3"></audio>
+
     <script>
-      // Floating hearts
       function createHeart() {
         const heart = document.createElement("div");
         heart.className = "heart";
@@ -121,23 +141,23 @@
       }
       setInterval(createHeart, 300);
 
-      // Speech Recognition
-      const SpeechRecognition =
-        window.SpeechRecognition || window.webkitSpeechRecognition;
-      const recognition = new SpeechRecognition();
-
-      recognition.continuous = false;
-      recognition.lang = "en-US";
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
-
       const diagnostic = document.querySelector(".output");
       const startBtn = document.querySelector("#startBtn");
       const yesBtn = document.querySelector("#yesBtn");
       const finalMsg = document.querySelector("#finalMsg");
       const afterSpeak = document.querySelector("#afterSpeak");
+      const pressSign = document.querySelector("#pressSign");
+
+      const voice1 = document.getElementById("voice1");
+      const voice2 = document.getElementById("voice2");
 
       let saidOnce = false;
+
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+
+      recognition.lang = "en-US";
 
       startBtn.onclick = () => {
         recognition.start();
@@ -149,26 +169,37 @@
         diagnostic.textContent = "You said: " + speech;
 
         if (speech.includes("i love you joshua my cutie")) {
+          // PERTAMA KALI
           if (!saidOnce) {
             afterSpeak.classList.remove("hidden");
             afterSpeak.classList.add("pop");
             saidOnce = true;
-          } else {
+
+            voice1.currentTime = 0;
+            voice1.play();
+          }
+
+          // KEDUA KALI
+          else {
             yesBtn.classList.remove("hidden");
             yesBtn.classList.add("pop", "scale-110");
+
+            pressSign.classList.remove("hidden");
+            pressSign.classList.add("pop");
+
+            voice2.currentTime = 0;
+            voice2.play();
           }
         }
       };
 
-      // YES click
       yesBtn.onclick = () => {
         finalMsg.classList.remove("hidden");
         finalMsg.classList.add("pop");
         yesBtn.innerText = "I LOVE YOU ❤️";
+        pressSign.classList.add("hidden");
 
-        for (let i = 0; i < 30; i++) {
-          createHeart();
-        }
+        for (let i = 0; i < 30; i++) createHeart();
       };
     </script>
   </body>
